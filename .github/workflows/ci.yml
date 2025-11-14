@@ -12,7 +12,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        # Test against multiple Node versions on PRs, single version on pushes
+        node-version: ${{ fromJson(github.event_name == 'pull_request' && '["18.x", "20.x"]' || '["20.x"]') }}
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +38,7 @@ jobs:
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
         with:
           name: dist-node-${{ matrix.node-version }}
           path: dist/
